@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS products (
+    id UUID PRIMARY KEY,
+    name VARCHAR(64) NOT NULL,
+    username VARCHAR(32) NOT NULL,
+    password VARCHAR(256) NOT NULL
+)
