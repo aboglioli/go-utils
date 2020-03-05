@@ -10,11 +10,17 @@ import (
 
 type Config struct {
 	MigrationPath string `json:"path"`
+	URL           string `json:"db_url"`
+	User          string `json:"db_user"`
+	Password      string `json:"db_password"`
 }
 
 func ReadConfig() *Config {
 	config := &Config{
 		MigrationPath: "migrations",
+		URL:           "localhost:5432",
+		User:          "",
+		Password:      "",
 	}
 
 	file, err := os.Open("migrations.json")
@@ -28,7 +34,7 @@ func ReadConfig() *Config {
 
 func main() {
 	config := ReadConfig()
-	fmt.Printf("[Config]\n- path: %s\n\n", config.MigrationPath)
+	fmt.Printf("[Config]\n%#v\n\n", config)
 
 	// Get migrations and scripts to run
 	ms, err := migrations.GetMigrations(config.MigrationPath, &migrations.MigrationOptions{
@@ -45,7 +51,7 @@ func main() {
 
 	migrator.SetMigrations(ms)
 
-	if err := migrator.Run(); err != nil {
+	if err := migrator.Run(config.URL, config.User, config.Password); err != nil {
 		fmt.Printf("# ERROR\n%s", err)
 	}
 }

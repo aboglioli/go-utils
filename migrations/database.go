@@ -27,7 +27,11 @@ func NewPostgresDB() *postgresDB {
 }
 
 func (postgres *postgresDB) Connect(url, database, user, passwd string) error {
-	connStr := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable", user, passwd, url, database)
+	connStr := "postgres://"
+	if user != "" && passwd != "" {
+		connStr = fmt.Sprintf("%s%s:%s@", connStr, user, passwd)
+	}
+	connStr = fmt.Sprintf("%s%s/%s?sslmode=disable", connStr, url, database)
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		return err

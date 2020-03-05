@@ -20,9 +20,9 @@ func (m *Migrator) SetMigrations(migrations []*Migration) {
 	m.migrations = migrations
 }
 
-func (m *Migrator) Run() error {
+func (m *Migrator) Run(url, user, password string) error {
 	for _, migration := range m.migrations {
-		if err := m.db.Connect("localhost:5432", migration.Database, "admin", "admin"); err != nil {
+		if err := m.db.Connect(url, migration.Database, user, password); err != nil {
 			return err
 		}
 
