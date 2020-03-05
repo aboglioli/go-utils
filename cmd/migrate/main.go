@@ -33,8 +33,13 @@ func ReadConfig() *Config {
 }
 
 func main() {
+	dir, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+
 	config := ReadConfig()
-	fmt.Printf("[Config]\n%#v\n\n", config)
+	fmt.Printf("[Config from %s]\n%#v\n\n", dir, config)
 
 	// Get migrations and scripts to run
 	ms, err := migrations.GetMigrations(config.MigrationPath, &migrations.MigrationOptions{
