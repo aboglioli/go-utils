@@ -1,6 +1,9 @@
 package migrations
 
-import "io/ioutil"
+import (
+	"io/ioutil"
+	"path/filepath"
+)
 
 type Migrator struct {
 	db         Database
@@ -20,13 +23,13 @@ func (m *Migrator) SetMigrations(migrations []*Migration) {
 	m.migrations = migrations
 }
 
-func (m *Migrator) Run(url, user, password string) error {
+func (m *Migrator) Run() error {
 	for _, migration := range m.migrations {
-		if err := m.db.Connect(url, migration.Database, user, password); err != nil {
+		if err := m.db.Connect(migration.Config.URL, migration.Config.Database, migration.Config.User, migration.Config.Password); err != nil {
 			return err
 		}
 
-		m.logger.Log("# Migrating %s:\n", migration.Database)
+		m.logger.Log("# Migrating %s in %s:\n", migration.Config.Database, migration.Config.URL)
 
 		oldScripts, err := m.db.GetScripts()
 		if err != nil {
@@ -34,25 +37,25 @@ func (m *Migrator) Run(url, user, password string) error {
 		}
 
 		for _, script := range migration.Scripts {
-			if _, ok := oldScripts[script]; ok {
-				m.logger.Log("- %s\n", script)
+			scriptPath := filepath.Join(migration.Path, migration.Dir, script)
+			if _, ok := oldScripts[scriptPath]; ok {
+				m.logger.Log("- %s\n", scriptPath)
 				continue
 			}
 
-			m.logger.Log("+ %s: ", script)
-			b, err := ioutil.ReadFile(script)
+			m.logger.Log("+ %s: ", scriptPath)
+			b, err := ioutil.ReadFile(scriptPath)
 			if err != nil {
 				return err
 			}
 
 			sql := string(b)
-
 			err = m.db.Exec(sql)
 			if err != nil {
 				return err
 			}
 
-			m.db.AddScript(script)
+			m.db.AddScript(scriptPath)
 
 			m.logger.Log("OK\n")
 		}

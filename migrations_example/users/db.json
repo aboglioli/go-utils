@@ -1,0 +1,6 @@
+{
+  "url": "remote.com:5432",
+  "user": "admin",
+  "password": "passwd",
+  "database": "users"
+}
