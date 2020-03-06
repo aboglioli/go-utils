@@ -2,7 +2,6 @@ package migrations
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -54,7 +53,6 @@ func GetMigrations(path string) ([]*Migration, error) {
 		}
 
 		file, err := os.Open(configPath)
-		fmt.Println(configPath)
 		if err == nil && file != nil {
 			if err := json.NewDecoder(file).Decode(&config); err != nil {
 				return nil, err
