@@ -50,6 +50,10 @@ func BuildStack(err error, opts *StackOptions) []Stack {
 			stack.Cause = nil
 		}
 	case error:
+		if opts.ExcludeInternal {
+			return []Stack{}
+		}
+
 		stack.Error = Error{
 			Type:    Unknown,
 			Message: err.Error(),
